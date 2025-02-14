@@ -24,53 +24,57 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* 视频列表容器：悬浮在左侧 */
+        /* 主内容区域样式 */
+        .main-content {
+            margin-left: 240px; /* 为左侧列表留出空间 */
+            padding: 20px;
+        }
+
+        /* 视频列表样式 */
         .video-list {
             position: fixed;
-            top: 70px;
+            top: 20px;
             left: 20px;
             width: 200px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            background-color: white;
+            border-radius: 12px;
             padding: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             z-index: 1000;
         }
 
-        /* 视频列表标题 */
         .video-list h3 {
-            margin: 0 0 10px;
-            font-size: 18px;
-            color: #333;
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 1.2em;
         }
 
-        /* 视频列表项 */
+        .video-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .video-list li {
+            margin-bottom: 10px;
+        }
+
         .video-list a {
             display: block;
-            margin: 5px 0;
             padding: 8px 12px;
-            color: #007bff;
+            color: #2c3e50;
             text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }   
-
-        /* 已观看视频样式 */
-        .video-list a.watched {
-            color: #27ae60;
-            /* font-weight: bold; */
-            /* pointer-events: none; */
+            border-radius: 6px;
+            transition: all 0.3s ease;
         }
 
-        /* 鼠标悬停样式 */
         .video-list a:hover {
-            background-color: #007bff;
-            color: #fff;
-        }   
+            background-color: #f0f2f5;
+            color: #3498db;
+        }
 
-        /* 视频列表容器 */
-        .video-list {
+        /* 视频列表容器：悬浮在左侧 */
+        .video-list-detail {
             position: fixed;
             top: 20px;
             left: 20px;
@@ -138,7 +142,7 @@
             background: linear-gradient(90deg, #2ecc71, #27ae60);
             transition: width 0.4s ease;
             box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
-             width: 0%; 初始宽度为0% */
+             width: 0%; /*初始宽度为0% */
         }
 
         /* 观看按钮样式 */
@@ -187,6 +191,18 @@
             .watch-btn {
                 padding: 8px 20px;
                 font-size: 0.9em;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .video-list {
+                position: relative;
+                width: auto;
+                margin-bottom: 20px;
+                top: auto;
+                left: auto;
             }
         }
 
@@ -237,6 +253,23 @@
             /* 总进度文本颜色
             #total-progress-text {
                 color: #ffffff !important;     强制使用白色文本，确保覆盖其他样式 } */
+
+            .video-list {
+                background-color: #2d2d2d;
+            }
+
+            .video-list h3 {
+                color: #ffffff;
+            }
+
+            .video-list a {
+                color: #ffffff;
+            }
+
+            .video-list a:hover {
+                background-color: #3d3d3d;
+                color: #3498db;
+            }
         }
 
         /* 总进度显示相关样式 */
@@ -274,65 +307,83 @@
             font-weight: bold;
         }
 
-        .in-progress {
+        /* .in-progress {
             color: #f39c12;
             font-weight: bold;
-        }
+        } */
     </style>
 </head>
 <body>
-    <!-- 页面标题 -->
-    <h1>视频学习平台</h1>
-
-    <!-- 总进度显示区域 -->
-    <div class="overall-progress">
-        <h2>总体学习进度</h2>
-        <div class="progress-bar">
-            <div class="progress" id="total-progress"></div>
-        </div>
-        <span id="total-progress-text">总进度: 0%</span>
-    </div>
-
-    <!-- 视频列表 -->
-    <div id="video-list">
+    <!-- 视频列表（悬浮在左侧） -->
+    <div class="video-list">
         <h3>视频列表</h3>
         <ul>
-            <li><a href="#video-1" onclick="markAsWatched('video1')">视频 1：React基础教程</a></li>
-            <li><a href="#video-2" onclick="markAsWatched('video2')">视频 2：Vue3 基础教程</a></li>
+            <li><a href="#video1">视频 1：React基础教程</a></li>
+            <li><a href="#video2">视频 2：Vue3 基础教程</a></li>
+            <li><a href="#video3">视频 3：春节</a></li>
         </ul>
     </div>
 
-    <!-- 视频列表区域 -->
-    <div id="video-list">
-        <div class="video-item">
-            <h3 id="video1">视频 1：React基础教程</h3>
-            <div class="video-container">
-                <iframe src="https://player.bilibili.com/player.html?bvid=BV1ff4y1P7G2&page=1&danmaku=0&high_quality=1&api=postMessage&autoplay=0&playlist=1&enable_playlist=1&as_wide=1&message=1" 
-                        scrolling="no" 
-                        border="0" 
-                        frameborder="no" 
-                        framespacing="0" 
-                        allowfullscreen="true">
-                </iframe>
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <h1>视频学习平台</h1>
+
+        <div class="overall-progress">
+            <h2>总体学习进度</h2>
+            <div class="progress-bar">
+                <div class="progress" id="total-progress"></div>
             </div>
-            <div class="status-text">
-                <span id="video-status-1">未观看</span>
-            </div>
+            <span id="total-progress-text">总进度: 0%</span>
         </div>
 
-        <div class="video-item">
-            <h3 id="video2">视频 2：Vue3 基础教程</h3>
-            <div class="video-container">
-                <iframe src="https://player.bilibili.com/player.html?bvid=BV1mUqGYEE8v&page=1&danmaku=0&high_quality=1&api=postMessage&autoplay=0&playlist=1&enable_playlist=1&as_wide=1&message=1" 
-                        scrolling="no" 
-                        border="0" 
-                        frameborder="no" 
-                        framespacing="0" 
-                        allowfullscreen="true">
-                </iframe>
+        <!-- 视频内容区域 -->
+        <div id="video-list-detail">
+            <div class="video-item">
+                <h3 id="video1">视频 1：React基础教程</h3>
+                <div class="video-container">
+                    <iframe src="https://player.bilibili.com/player.html?bvid=BV1ff4y1P7G2&page=1&danmaku=0&high_quality=1&api=postMessage&autoplay=0&playlist=1&enable_playlist=1&as_wide=1&message=1" 
+                            scrolling="no" 
+                            border="0" 
+                            frameborder="no" 
+                            framespacing="0" 
+                            allowfullscreen="true">
+                    </iframe>
+                </div>
+                <div class="status-text">
+                    <span id="video-status-1">未观看</span>
+                </div>
             </div>
-            <div class="status-text">
-                <span id="video-status-2">未观看</span>
+
+            <div class="video-item">
+                <h3 id="video2">视频 2：Vue3 基础教程</h3>
+                <div class="video-container">
+                    <iframe src="https://player.bilibili.com/player.html?bvid=BV1mUqGYEE8v&page=1&danmaku=0&high_quality=1&api=postMessage&autoplay=0&playlist=1&enable_playlist=1&as_wide=1&message=1" 
+                            scrolling="no" 
+                            border="0" 
+                            frameborder="no" 
+                            framespacing="0" 
+                            allowfullscreen="true">
+                    </iframe>
+                </div>
+                <div class="status-text">
+                    <span id="video-status-2">未观看</span>
+                </div>
+            </div>
+
+            <div class="video-item">
+                <h3 id="video3">视频 3：春节</h3>
+                <div class="video-container">
+                    <iframe src="https://player.bilibili.com/player.html?bvid=BV14TFTeHEFP&page=1&danmaku=0&high_quality=1&api=postMessage&autoplay=0&playlist=1&enable_playlist=1&as_wide=1&message=1" 
+                            scrolling="no" 
+                            border="0" 
+                            frameborder="no" 
+                            framespacing="0" 
+                            allowfullscreen="true">
+                    </iframe>
+                </div>
+                <div class="status-text">
+                    <span id="video-status-2">未观看</span>
+                </div>
             </div>
         </div>
     </div>
