@@ -394,213 +394,232 @@
     <!-- JavaScript 代码 -->
     <script>
         // 定义视频数据
-        const videos = [
-            { id: "video1", title: "视频 1：React基础教程" ,bvid: "BV1ff4y1P7G2"},
-            { id: "video2", title: "视频 2：Vue3 基础教程" ,bvid:"BV1mUqGYEE8v"},
-            { id: "video3", title: "视频 3：春节" ,bvid:"BV14TFTeHEFP"}
-        ];
+        // const videos = [
+        //     { id: "video1", title: "视频 1：React基础教程" ,bvid: "BV1ff4y1P7G2"},
+        //     { id: "video2", title: "视频 2：Vue3 基础教程" ,bvid:"BV1mUqGYEE8v"},
+        //     { id: "video3", title: "视频 3：春节" ,bvid:"BV14TFTeHEFP"}
+        // ];
 
-        // 获取视频列表容器
-        const videoListContainer = document.getElementById("video-list");
-        const videoListDetail = document.getElementById("video-list-detail");
+        let videos=[];
 
-        // 创建无序列表元素
-        const ul = document.createElement("ul");
+        fetch('http://127.0.0.1:8000/api/videos/')
+            .then(response => response.json())  // 解析返回的JSON数据
+            .then(data => {
+                // 赋值给全局变量
+                videos = data;
+                // console.log('data:',data);
+                // 渲染视频数据
+                renderVideos();
+            })
+            .catch(error => {
+                console.error('获取视频数据时出错:', error);
+            });
 
-        // 使用循环动态生成列表项
-        videos.forEach(video => {
-            const li = document.createElement("li");
-            const a = document.createElement("a");
-            a.href = `#${video.id}`;
-            a.textContent = video.title;
-            li.appendChild(a);
-            ul.appendChild(li);
-        });
+        function renderVideos(){
+// 获取视频列表容器
+            const videoListContainer = document.getElementById("video-list");
+            const videoListDetail = document.getElementById("video-list-detail");
 
-        // 将生成的列表添加到页面中的容器
-        videoListContainer.appendChild(ul);
+            // 创建无序列表元素
+            const ul = document.createElement("ul");
 
-        videos.forEach((video, index) => {
-            // 创建 video-item 容器
-            const videoItem = document.createElement("div");
-            videoItem.className = "video-item";
+            // 使用循环动态生成列表项
+            videos.forEach(video => {
+                const li = document.createElement("li");
+                const a = document.createElement("a");
+                a.href = `#${video.id}`;
+                a.textContent = video.title;
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
 
-            // 创建标题
-            const title = document.createElement("h3");
-            title.id = video.id;
-            title.textContent = video.title;
+            // 将生成的列表添加到页面中的容器
+            videoListContainer.appendChild(ul);
 
-            // 创建视频播放容器
-            const videoContainer = document.createElement("div");
-            videoContainer.className = "video-container";
+            videos.forEach((video, index) => {
+                // 创建 video-item 容器
+                const videoItem = document.createElement("div");
+                videoItem.className = "video-item";
 
-            const iframe = document.createElement("iframe");
-            iframe.src = `https://player.bilibili.com/player.html?bvid=${video.bvid}&page=1&danmaku=0&high_quality=1&api=postMessage&autoplay=0&playlist=1&enable_playlist=1&as_wide=1&message=1`;
-            iframe.scrolling = "no";
-            iframe.border = "0";
-            iframe.frameBorder = "no";
-            iframe.framespacing = "0";
-            iframe.allowFullscreen = "true";
+                // 创建标题
+                const title = document.createElement("h3");
+                title.id = video.id;
+                title.textContent = video.title;
 
-            videoContainer.appendChild(iframe);
+                // 创建视频播放容器
+                const videoContainer = document.createElement("div");
+                videoContainer.className = "video-container";
 
-            // 创建状态文本
-            const statusText = document.createElement("div");
-            statusText.className = "status-text";
+                const iframe = document.createElement("iframe");
+                iframe.src = `https://player.bilibili.com/player.html?bvid=${video.bvid}&page=1&danmaku=0&high_quality=1&api=postMessage&autoplay=0&playlist=1&enable_playlist=1&as_wide=1&message=1`;
+                iframe.scrolling = "no";
+                iframe.border = "0";
+                iframe.frameBorder = "no";
+                iframe.framespacing = "0";
+                iframe.allowFullscreen = "true";
 
-            const statusSpan = document.createElement("span");
-            statusSpan.id = `video-status-${index + 1}`;
-            statusSpan.textContent = "未观看";
+                videoContainer.appendChild(iframe);
 
-            statusText.appendChild(statusSpan);
+                // 创建状态文本
+                const statusText = document.createElement("div");
+                statusText.className = "status-text";
 
-            // 将所有内容添加到 video-item 容器
-            videoItem.appendChild(title);
-            videoItem.appendChild(videoContainer);
-            videoItem.appendChild(statusText);
+                const statusSpan = document.createElement("span");
+                statusSpan.id = `video-status-${index + 1}`;
+                statusSpan.textContent = "未观看";
 
-            // 将 video-item 添加到页面中的容器
-            videoListDetail.appendChild(videoItem);
-        });
-        
-        /* Bilibili播放器类 */
-        class BilibiliPlayer {
-            constructor(videoId) {
-                /* 初始化播放器属性和事件监听 */
-                this.videoId = videoId;
-                this.isCompleted = false;
-                const iframes = document.querySelectorAll('iframe');
-                this.iframe = iframes[videoId - 1];
-                
-                // 清除之前的状态
-                localStorage.removeItem(`video-${this.videoId}-watched`);
-                
-                // 添加点击监听
-                this.setupClickListener();
-                // 添加播放器消息监听
-                this.setupMessageListener();
-            }
+                statusText.appendChild(statusSpan);
 
-            /* 设置点击监听器 */
-            setupClickListener() {
-                // 创建一个覆盖层来检测第一次点击
-                const container = this.iframe.parentElement;
-                const overlay = document.createElement('div');
-                overlay.className = 'video-overlay';
-                overlay.style.cssText = `
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    z-index: 1;
-                    cursor: pointer;
-                    background: rgba(0, 0, 0, 0.1);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                `;
-                
-                const playButton = document.createElement('div');
-                playButton.innerHTML = '点击播放';
-                playButton.style.cssText = `
-                    color: white;
-                    background: rgba(0, 0, 0, 0.7);
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    font-size: 16px;
-                `;
-                
-                overlay.appendChild(playButton);
-                container.appendChild(overlay);
+                // 将所有内容添加到 video-item 容器
+                videoItem.appendChild(title);
+                videoItem.appendChild(videoContainer);
+                videoItem.appendChild(statusText);
 
-                overlay.addEventListener('click', () => {
-                    overlay.style.display = 'none';
-                    this.startWatchTimer();
-                    // 发送播放命令给播放器
-                    this.postMessage('play');
-                });
-            }
-
-            /* 设置播放器消息监听器 */
-            setupMessageListener() {
-                window.addEventListener('message', (e) => {
-                    if (e.origin !== "https://player.bilibili.com") return;
+                // 将 video-item 添加到页面中的容器
+                videoListDetail.appendChild(videoItem);
+            });
+            
+            /* Bilibili播放器类 */
+            class BilibiliPlayer {
+                constructor(videoId) {
+                    /* 初始化播放器属性和事件监听 */
+                    this.videoId = videoId;
+                    this.isCompleted = false;
+                    const iframes = document.querySelectorAll('iframe');
+                    this.iframe = iframes[videoId - 1];
                     
-                    try {
-                        const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-                        console.log(`Video ${this.videoId} received:`, data);
-                    } catch (error) {
-                        console.error('Failed to parse message:', error);
+                    // 清除之前的状态
+                    localStorage.removeItem(`video-${this.videoId}-watched`);
+                    
+                    // 添加点击监听
+                    this.setupClickListener();
+                    // 添加播放器消息监听
+                    this.setupMessageListener();
+                }
+
+                /* 设置点击监听器 */
+                setupClickListener() {
+                    // 创建一个覆盖层来检测第一次点击
+                    const container = this.iframe.parentElement;
+                    const overlay = document.createElement('div');
+                    overlay.className = 'video-overlay';
+                    overlay.style.cssText = `
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        z-index: 1;
+                        cursor: pointer;
+                        background: rgba(0, 0, 0, 0.1);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    `;
+                    
+                    const playButton = document.createElement('div');
+                    playButton.innerHTML = '点击播放';
+                    playButton.style.cssText = `
+                        color: white;
+                        background: rgba(0, 0, 0, 0.7);
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        font-size: 16px;
+                    `;
+                    
+                    overlay.appendChild(playButton);
+                    container.appendChild(overlay);
+
+                    overlay.addEventListener('click', () => {
+                        overlay.style.display = 'none';
+                        this.startWatchTimer();
+                        // 发送播放命令给播放器
+                        this.postMessage('play');
+                    });
+                }
+
+                /* 设置播放器消息监听器 */
+                setupMessageListener() {
+                    window.addEventListener('message', (e) => {
+                        if (e.origin !== "https://player.bilibili.com") return;
+                        
+                        try {
+                            const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+                            console.log(`Video ${this.videoId} received:`, data);
+                        } catch (error) {
+                            console.error('Failed to parse message:', error);
+                        }
+                    });
+                }
+
+                /* 开始观看计时器 */
+                startWatchTimer() {
+                    // 设置一个定时器，10秒后标记为已观看
+                    setTimeout(() => {
+                        this.markAsCompleted();
+                    }, 10000);
+                }
+
+                /* 向播放器发送消息 */
+                postMessage(action, data = {}) {
+                    const message = { type: action, data: data };
+                    this.iframe.contentWindow.postMessage(JSON.stringify(message), '*');
+                }
+
+                /* 标记视频为已完成 */
+                markAsCompleted() {
+                    if (!this.isCompleted) {
+                        console.log(`Marking video ${this.videoId} as completed`);
+                        this.isCompleted = true;
+                        localStorage.setItem(`video-${this.videoId}-watched`, 'true');
+                        this.updateStatusDisplay('已观看', 'completed');
+                        this.updateTotalProgress();
                     }
-                });
-            }
-
-            /* 开始观看计时器 */
-            startWatchTimer() {
-                // 设置一个定时器，10秒后标记为已观看
-                setTimeout(() => {
-                    this.markAsCompleted();
-                }, 10000);
-            }
-
-            /* 向播放器发送消息 */
-            postMessage(action, data = {}) {
-                const message = { type: action, data: data };
-                this.iframe.contentWindow.postMessage(JSON.stringify(message), '*');
-            }
-
-            /* 标记视频为已完成 */
-            markAsCompleted() {
-                if (!this.isCompleted) {
-                    console.log(`Marking video ${this.videoId} as completed`);
-                    this.isCompleted = true;
-                    localStorage.setItem(`video-${this.videoId}-watched`, 'true');
-                    this.updateStatusDisplay('已观看', 'completed');
-                    this.updateTotalProgress();
                 }
-            }
 
-            /* 更新状态显示 */
-            updateStatusDisplay(text, className) {
-                const statusElement = document.getElementById(`video-status-${this.videoId}`);
-                if (statusElement) {
-                    statusElement.className = '';
-                    if (className) {
-                        statusElement.classList.add(className);
+                /* 更新状态显示 */
+                updateStatusDisplay(text, className) {
+                    const statusElement = document.getElementById(`video-status-${this.videoId}`);
+                    if (statusElement) {
+                        statusElement.className = '';
+                        if (className) {
+                            statusElement.classList.add(className);
+                        }
+                        statusElement.textContent = text;
                     }
-                    statusElement.textContent = text;
+                }
+
+                /* 更新总进度 */
+                updateTotalProgress() {
+                    const allPlayers = window.videoPlayers || [];
+                    const completedCount = allPlayers.filter(player => player.isCompleted).length;
+                    const totalProgress = Math.floor((completedCount / TOTAL_VIDEOS) * 100);
+                    
+                    const progressBar = document.getElementById('total-progress');
+                    const progressText = document.getElementById('total-progress-text');
+                    
+                    if (progressBar && progressText) {
+                        progressBar.style.width = `${totalProgress}%`;
+                        progressText.textContent = `总进度: ${totalProgress}% (${completedCount}/${TOTAL_VIDEOS}个视频)`;
+                    }
                 }
             }
 
-            /* 更新总进度 */
-            updateTotalProgress() {
-                const allPlayers = window.videoPlayers || [];
-                const completedCount = allPlayers.filter(player => player.isCompleted).length;
-                const totalProgress = Math.floor((completedCount / TOTAL_VIDEOS) * 100);
-                
-                const progressBar = document.getElementById('total-progress');
-                const progressText = document.getElementById('total-progress-text');
-                
-                if (progressBar && progressText) {
-                    progressBar.style.width = `${totalProgress}%`;
-                    progressText.textContent = `总进度: ${totalProgress}% (${completedCount}/${TOTAL_VIDEOS}个视频)`;
+            /* 初始化代码 */
+            const TOTAL_VIDEOS = videos.length;
+            window.videoPlayers = [];
+
+            /* 页面加载完成后初始化播放器 */
+            window.onload = function() {
+                // 创建新实例
+                for (let i = 1; i <= TOTAL_VIDEOS; i++) {
+                    const player = new BilibiliPlayer(i);
+                    window.videoPlayers.push(player);
                 }
-            }
+            };
         }
 
-        /* 初始化代码 */
-        const TOTAL_VIDEOS = videos.length;
-        window.videoPlayers = [];
-
-        /* 页面加载完成后初始化播放器 */
-        window.onload = function() {
-            // 创建新实例
-            for (let i = 1; i <= TOTAL_VIDEOS; i++) {
-                const player = new BilibiliPlayer(i);
-                window.videoPlayers.push(player);
-            }
-        };
+        
     </script>
 </body>
 </html>
