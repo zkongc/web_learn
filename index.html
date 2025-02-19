@@ -9,8 +9,9 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 1000px;
+            height: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0px;
             background-color: #f5f7fa;
             color: #2c3e50;
         }
@@ -315,12 +316,13 @@
 </head>
 <body>
     <!-- 视频列表（悬浮在左侧） -->
-    <div class="video-list">
+    <!-- <div class="video-list" style="max-height: 100vh; overflow-y: scroll;"> -->
+    <div class="video-list" style="max-height: calc(100vh - 40px); overflow-y: auto;">
         <h3>视频列表</h3>
-        <ul>
-            <li><a href="#video1">视频 1：React基础教程</a></li>
+        <ul id="video-list">
+            <!-- <li><a href="#video1">视频 1：React基础教程</a></li>
             <li><a href="#video2">视频 2：Vue3 基础教程</a></li>
-            <li><a href="#video3">视频 3：春节</a></li>
+            <li><a href="#video3">视频 3：春节</a></li> -->
         </ul>
     </div>
 
@@ -337,7 +339,8 @@
         </div>
 
         <!-- 视频内容区域 -->
-        <div id="video-list-detail">
+        <div id="video-list-detail"></div>
+        <!-- <div id="video-list-detail">
             <div class="video-item">
                 <h3 id="video1">视频 1：React基础教程</h3>
                 <div class="video-container">
@@ -347,7 +350,7 @@
                             frameborder="no" 
                             framespacing="0" 
                             allowfullscreen="true">
-                    </iframe>
+                    </iframe>  
                 </div>
                 <div class="status-text">
                     <span id="video-status-1">未观看</span>
@@ -385,11 +388,81 @@
                     <span id="video-status-2">未观看</span>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <!-- JavaScript 代码 -->
     <script>
+        // 定义视频数据
+        const videos = [
+            { id: "video1", title: "视频 1：React基础教程" ,bvid: "BV1ff4y1P7G2"},
+            { id: "video2", title: "视频 2：Vue3 基础教程" ,bvid:"BV1mUqGYEE8v"},
+            { id: "video3", title: "视频 3：春节" ,bvid:"BV14TFTeHEFP"}
+        ];
+
+        // 获取视频列表容器
+        const videoListContainer = document.getElementById("video-list");
+        const videoListDetail = document.getElementById("video-list-detail");
+
+        // 创建无序列表元素
+        const ul = document.createElement("ul");
+
+        // 使用循环动态生成列表项
+        videos.forEach(video => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = `#${video.id}`;
+            a.textContent = video.title;
+            li.appendChild(a);
+            ul.appendChild(li);
+        });
+
+        // 将生成的列表添加到页面中的容器
+        videoListContainer.appendChild(ul);
+
+        videos.forEach((video, index) => {
+            // 创建 video-item 容器
+            const videoItem = document.createElement("div");
+            videoItem.className = "video-item";
+
+            // 创建标题
+            const title = document.createElement("h3");
+            title.id = video.id;
+            title.textContent = video.title;
+
+            // 创建视频播放容器
+            const videoContainer = document.createElement("div");
+            videoContainer.className = "video-container";
+
+            const iframe = document.createElement("iframe");
+            iframe.src = `https://player.bilibili.com/player.html?bvid=${video.bvid}&page=1&danmaku=0&high_quality=1&api=postMessage&autoplay=0&playlist=1&enable_playlist=1&as_wide=1&message=1`;
+            iframe.scrolling = "no";
+            iframe.border = "0";
+            iframe.frameBorder = "no";
+            iframe.framespacing = "0";
+            iframe.allowFullscreen = "true";
+
+            videoContainer.appendChild(iframe);
+
+            // 创建状态文本
+            const statusText = document.createElement("div");
+            statusText.className = "status-text";
+
+            const statusSpan = document.createElement("span");
+            statusSpan.id = `video-status-${index + 1}`;
+            statusSpan.textContent = "未观看";
+
+            statusText.appendChild(statusSpan);
+
+            // 将所有内容添加到 video-item 容器
+            videoItem.appendChild(title);
+            videoItem.appendChild(videoContainer);
+            videoItem.appendChild(statusText);
+
+            // 将 video-item 添加到页面中的容器
+            videoListDetail.appendChild(videoItem);
+        });
+        
         /* Bilibili播放器类 */
         class BilibiliPlayer {
             constructor(videoId) {
@@ -517,7 +590,7 @@
         }
 
         /* 初始化代码 */
-        const TOTAL_VIDEOS = 2;
+        const TOTAL_VIDEOS = videos.length;
         window.videoPlayers = [];
 
         /* 页面加载完成后初始化播放器 */
