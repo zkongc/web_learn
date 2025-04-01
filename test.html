@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- ... existing code ... -->
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div class="navbar">
+        <!-- 添加图标 -->
+        <img class="logo" src="logo.png" alt="Logo">
+        <ul>
+            <li><a href="#" data-target="video">视频</a></li>
+            <li><a href="#" data-target="document">文档</a></li>
+            <li><a href="#" data-target="exam">考试</a></li>
+        </ul>
+        <div class="login">用户登录</div>
+    </div>
+
+    <!-- 视频列表（悬浮在左侧） -->
+    <div class="video-list" style="max-height: calc(100vh - 40px); overflow-y: auto;">
+        <h3>视频列表</h3>
+        <ul id="video-list">
+            <!-- 视频列表项将通过 JavaScript 动态生成 -->
+        </ul>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <h1>视频学习平台</h1>
+
+        <div class="overall-progress">
+            <h2>总体学习进度</h2>
+            <div class="progress-bar">
+                <div class="progress" id="total-progress"></div>
+            </div>
+            <span id="total-progress-text">总进度: 0%</span>
+        </div>
+
+        <!-- 视频内容区域 -->
+        <div id="video" class="content">
+            <div id="video-list-detail"></div>
+        </div>
+
+        <!-- 文档内容区域 -->
+        <div id="document" class="content" style="display: none;">
+            <h2>文档界面</h2>
+            <!-- 这里可以添加文档内容 -->
+        </div>
+
+        <!-- 考试内容区域 -->
+        <div id="exam" class="content" style="display: none;">
+            <h2>考试界面</h2>
+            <!-- 这里可以添加考试内容 -->
+        </div>
+    </div>
+
+    <!-- JavaScript 代码 -->
+    <script>
+        // ... existing code ...
+
+        function renderVideos() {
+            // ... existing code ...
+        }
+
+        // 界面切换逻辑
+        const navLinks = document.querySelectorAll('.navbar ul li a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = link.dataset.target;
+                const contents = document.querySelectorAll('.content');
+                contents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                const targetContent = document.getElementById(target);
+                targetContent.style.display = 'block';
+            });
+        });
+
+        // 页面加载完成后初始化播放器
+        window.onload = function() {
+            renderVideos();
+            // 默认显示视频界面
+            const defaultContent = document.getElementById('video');
+            defaultContent.style.display = 'block';
+        };
+    </script>
+</body>
+</html>
